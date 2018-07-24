@@ -2,56 +2,11 @@ import struct
 import base58
 import hashlib
 import ecdsa
+import binascii
 from bitcoinrpc.authproxy import AuthServiceProxy, JSONRPCException
 
-"""
-To use this program please make sure you have Bitcoin Core (testnet) running on your machine. You would also need to install some of the common libraries like ecdsa etc.
 
-This program runs on Python 2.7 in interactive mode. When you run the program, you need to provide your favorite message/quote as the input.
-
-Once the message is provided, it will grab one spendable transaction, calculate the fee, and create the raw transaction, sign it, and publish it on the blockchain.
-
-Big thanks to all open source community and all the people who have taken the time and provided wonderful tutorials, videos, and answered the questions for newbees like me.
-
-Constructing a Bitcoin Transaction - 7 awesome youtube videos by Shlomi Zeltsinger
-	https://www.youtube.com/playlist?list=PLH4m2oS2ratfeNpZAoVwPlQqEr3HgNu7S
-	https://www.youtube.com/playlist?list=PLH4m2oS2ratf2N7l-LSU4qeeGwtbhzfWc
-
-hexadecimal basics by Corey Schafer:
-	https://www.youtube.com/watch?v=ZL-LhaaMTTE
-
-ASCII Tutorial by dizauvi (3 videos):
-	https://www.youtube.com/watch?v=B1Sf1IhA0j4
-
-Big Endian vs Little Endian by Michael Cote:
-	https://www.youtube.com/watch?v=JrNF0KRAlyo
-
-Bits vs Bytes as Fast As Possible by Techquickie: 
-	https://www.youtube.com/watch?v=Dnd28lQHquU
-
-Bitcoin Command Line by Christopher
-	https://github.com/ChristopherA/Learning-Bitcoin-from-the-Command-Line
-
-Python-Bitcoin/JSON RPC library by Jeff Garzik
-	https://github.com/jgarzik/python-bitcoinrpc
-"""
-
-"""
-		<-- Here is the sample of what the program would look like when you run it locally -->
-
-			Enter your Bitcoin Core RPC User Name:<<<Username>>>
-			Enter your Bitcoin Core RPC Password:<<<Password>>>
-			Enter your favorite message or quote:<<<Quote>>>
-			Congratulations! You have just published a transaction to the Bitcoin blockchain.
-			Previoux TxnId: 330788c3dfc18808a04107d8c0c8f598d73eade8b1479e69b3db3ee3aa85aa98
-			New TxnId: 52e12ca20970a579bd62107054c45be33b5e21c31faa56de930df61bb043bf80
-
-"""
-# Installed https://github.com/jgarzik/python-bitcoinrpc
-# pip install python-bitcoinrpc 
-# pip install python-jsonrpc
-
-#get the Bitcoin Core credentials
+#get the Bitcoin Core local node credentials
 rpc_user=raw_input('Enter your Bitcoin Core RPC User Name:')
 rpc_password=raw_input('Enter your Bitcoin Core RPC Password:')
 
@@ -78,18 +33,16 @@ unspent_amount = long(unspent_tx[0]['amount'] * 100000000) #convert to satoshis
 
 #get the fee estimate. There are sophisticated ways to estimate but for this assignment I am using the simple method
 feeestimate = rpc_connection.estimatesmartfee(6)
-tx_fee = long(feeestimate['feerate']*100000000)
+tx_fee = long(feeestimate['feerate']*100000000) #satoshis
 
 # calculate the change amount
-change_amount = unspent_amount - tx_fee
+change_amount = unspent_amount - tx_fee #satoshis
 
 # 1. Create the raw transaction without using any bitcoin python library
 # 2. This transaction have 1 input and two output
 # 3. Input = prv_txid and 2 Outputs are a) OP_RETURN and b) Change
-#  
-# 2. raw tx and sign that tx using my private key (this is the only way to prove that I'm Bob)
-# 3. raw tx and signature in order to create the real tx
 
+# define the raw_tx class
 class raw_tx:
 	version 		= struct.pack("<L", 2)
 	tx_in_count 	= struct.pack("<B", 1)
@@ -99,11 +52,12 @@ class raw_tx:
 	tx_out2 		= {} #TEMP
 	lock_time 		= struct.pack("<L", 0)
 
+# function to flip the bytes (little endian)
 def flip_byte_order(string):
 	flipped = "".join(reversed([string[i:i+2] for i in range(0, len(string), 2)]))
 	return flipped
 
-
+# create the class
 rtx = raw_tx()
 
 rtx.tx_in["txouthash"] 		= flip_byte_order(prv_txid).decode("hex") #flip for little endian
@@ -113,14 +67,13 @@ rtx.tx_in["script"] 		= ("76a914%s88ac" % wallet_hashed_pubkey).decode("hex")
 rtx.tx_in["scrip_bytes"] 	= struct.pack("<B", len(rtx.tx_in["script"]))
 rtx.tx_in["sequence"]		= "ffffffff".decode("hex")
 
-import binascii
 def OP_RETURN_bin_to_hex(string):
 	return binascii.hexlify(string)
 
-# Create output 1: OP_RETURN
+# create output 1: OP_RETURN
 rtx.tx_out1["value"]			= struct.pack("<Q", 0)
 
-#TO DO: Capture the string in the input. AND explain the different codes in RAW
+# Capture the user message input
 user_message = raw_input('Enter your favorite message or quote:')
 
 op_return_data 					= OP_RETURN_bin_to_hex(user_message) #data to be stored on blockchain
