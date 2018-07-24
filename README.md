@@ -1,6 +1,6 @@
 # Publish a Message on Bitcoin Blockchain
 
-As part of my Master in Digital Currencies & Blockchain from University of Nicosia, Cyprus; I have created this program to publish a message on Bitcoin blockchain. 
+As part of my [Master in Digital Currencies & Blockchain from University of Nicosia, Cyprus](https://digitalcurrency.unic.ac.cy/about-the-program/); I have created this program to publish a message on Bitcoin blockchain. 
 
 ## Getting Started
 
@@ -23,13 +23,14 @@ Enter your Bitcoin Core RPC Password:<<<Password>>>
 Enter your favorite message or quote:<<<Quote>>>
 ```
 ### Output
+
 ```
 Congratulations! You have just published a transaction to the Bitcoin blockchain.
-**Previoux TxnId:** 330788c3dfc18808a04107d8c0c8f598d73eade8b1479e69b3db3ee3aa85aa98
-**New TxnId:** 52e12ca20970a579bd62107054c45be33b5e21c31faa56de930df61bb043bf80
+Previoux TxnId: 330788c3dfc18808a04107d8c0c8f598d73eade8b1479e69b3db3ee3aa85aa98
+New TxnId: 52e12ca20970a579bd62107054c45be33b5e21c31faa56de930df61bb043bf80
 ```
 ## Acknowledgements
-Big thanks to all open source community and all the people who have taken the time and provided wonderful tutorials, videos, and answered the questions for newbees like me.
+Big thanks to all the people who have taken the time to provide wonderful tutorials, videos, and answered the questions for newbees like me.
 
 ### 7 awesome youtube videos by Shlomi Zeltsinger
  1. [Bitcoin Pyhton Tutorials for Beginners](https://www.youtube.com/playlist?list=PLH4m2oS2ratfeNpZAoVwPlQqEr3HgNu7S)
